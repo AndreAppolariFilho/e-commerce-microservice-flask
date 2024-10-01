@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  auth_service:
+    build: auth-service/
+    ports:
+      5001:5001
+    env_file:
+      - auth-service/.env.dev
+    volumes:
+      - .:/app
+  products_service:
+    build: products-service/
+    ports:
+      5002:5002
+    depends_on:
+      - auth_service
+    links:
+      - auth_service:auth_service
+    env_file:
+      - products-service/.env.dev
+    volumes:
+      - .:/app
+  shopping_service:
+    build: shopping-service/
+    ports:
+      5003:5003
+    depends_on:
+      - auth_service
+      - products_service
+    links:
+      - auth_service:auth_service
+      - products_service:products_service
+    env_file:
+      - shopping-service/.env.dev
+    volumes:
+      - .:/app
