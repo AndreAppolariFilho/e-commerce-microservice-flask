@@ -8,7 +8,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("APPLICATION_SECRET_KEY", "SECRET_KEY")
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URL", 'sqlite:///db/users.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URL", f'sqlite:///{os.path.join("db", "users.db")}')
 app.config["JWT_SECRET_KEY"] = os.environ.get("APPLICATION_JWT_SECRET_KEY", 'your_jwt_secret_key')
 db = SQLAlchemy(app)
 # JWT Initialization
@@ -42,6 +42,8 @@ class User(db.Model):
             "is_admin": self.is_admin
         }
 
+with app.app_context():
+    db.create_all()
 
 """
 Views
@@ -95,6 +97,4 @@ def validate():
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True, host="0.0.0.0", port=os.environ.get("port", "5001"))
