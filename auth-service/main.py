@@ -61,6 +61,10 @@ def register():
         user = User()
         user.username = data["username"]
         user.set_password(data["password"])
+        if data["is_admin"] == "true":
+            user.is_admin = True
+        else:
+            user.is_admin = False
         db.session.add(user)
         db.session.commit()
         return jsonify(user.serialize()), 200
