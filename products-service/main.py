@@ -133,8 +133,14 @@ def single_stock_api_view(product_id):
             Stock.query.filter(Stock.product_id == product_id).one_or_none().serialize()
         ), 200
     if request.method == "GET":
+        stock = Stock.query.filter(Stock.product_id == product_id and Stock.is_completed).one_or_none()
+        if not stock:
+            return jsonify({"error": "This product doesn't exist or there's no stock registered for it."}), 404
         return jsonify(
-            Stock.query.filter(Stock.product_id == product_id and Stock.is_completed).one_or_none().serialize()
+            {
+                **Product.query.filter(Product.id == product_id).one_or_none().serialize(),
+                **stock.serialize()
+            }
         ), 200
 
 
